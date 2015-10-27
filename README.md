@@ -13,4 +13,5 @@ Management system for bleepr
 ## Running the app
 
 * `. venv/bin/activate`
-* `python app.py`
+* `python -O app.py`
+  - Or `python app.py` if you want to start in debug mode.
