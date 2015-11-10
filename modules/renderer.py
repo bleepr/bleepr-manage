@@ -15,6 +15,7 @@ class Table(object):
         y_0 = self.y - (self.height / 2)
         x_1 = self.x + (self.width / 2)
         y_1 = self.y + (self.height / 2)
+        print([x_0, y_0, x_1, y_1])
         return [x_0, y_0, x_1, y_1]
 
 class Renderer(object):
@@ -95,7 +96,7 @@ class Renderer(object):
 def main():
     r = Renderer()
     r.load_map("../share/test_map.png")
-    r.load_data("../share/data_table.txt")
+    r.load_data("../share/slip_room.txt")
     r.add_tables()
     r.save_map("../share/test_saved.png")
 
