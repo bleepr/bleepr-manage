@@ -1,56 +1,86 @@
-# import the Flask class from the flask module
-from flask import Flask, render_template, redirect, url_for, request, session, flash
-from functools import wraps
+from flask import Flask, flash, redirect, url_for, request
+from flask import get_flashed_messages, render_template
+from flask.ext.login import LoginManager, UserMixin
+from flask.ext.login import current_user, login_user, logout_user
 
-# create the application object
 app = Flask(__name__)
 
-# config
-app.secret_key = 'my precious'
+app.config['SECRET_KEY'] = 'some_secret_key_wink_wink'
 
-# login required decorator
-def login_required(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return f(*args, **kwargs)
-        else:
-            flash('You need to login first.')
-            return redirect(url_for('login'))
-    return wrap
+login_manager = LoginManager()
+login_manager.init_app(app)
 
-# use decorators to link the function to a url
+
+class UserNotFoundError(Exception):
+    pass
+
+
+class User(UserMixin):
+    '''Simple User class'''
+    USERS = {
+        # username: password
+        'john@ed': 'lol',
+        'mary': 'love peter',
+        'edran' : 'edran'
+    }
+
+    def __init__(self, id):
+        if not id in self.USERS:
+            raise UserNotFoundError()
+        self.id = id
+        self.password = self.USERS[id]
+
+    @classmethod
+    def get(self_class, id):
+        '''Return user instance of id, return None if not exist'''
+        try:
+            return self_class(id)
+        except UserNotFoundError:
+            return None
+
+
+@login_manager.user_loader
+def load_user(id):
+    return User.get(id)
+
+
 @app.route('/')
-@login_required
-def home():
-    return render_template('index.html')  # render a template
-    # return "Hello, World!"  # return a string
+def index():
+    if current_user.is_authenticated:
+        return render_template('portal.html')
+    else:
+        return render_template('signin.html')
 
-@app.route('/welcome')
-def welcome():
-    return render_template('welcome.html')  # render a template
 
-# route for handling the login page logic
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login')
 def login():
-    error = None
-    if request.method == 'POST':
-        if request.form['username'] != 'admin' or request.form['password'] != 'admin':
-            error = 'Invalid Credentials. Please try again.'
-        else:
-            session['logged_in'] = True
-            flash('You were logged in.')
-            return redirect(url_for('home'))
-    return render_template('login.html', error=error)
+    return '''
+        <form action="/login/check" method="post">
+            <p>Username: <input name="username" type="text"></p>
+            <p>Password: <input name="password" type="password"></p>
+            <input type="submit">
+        </form>
+    '''
+
+
+@app.route('/login/check', methods=['post'])
+def login_check():
+    # validate username and password
+    user = User.get(request.form['username'])
+    print user
+    if (user and user.password == request.form['password']):
+        login_user(user)
+    else:
+        flash('Username or password incorrect')
+
+    return redirect(url_for('index'))
+
 
 @app.route('/logout')
-@login_required
 def logout():
-    session.pop('logged_in', None)
-    flash('You were logged out.')
-    return redirect(url_for('welcome'))
+    logout_user()
+    return redirect(url_for('index'))
 
 
-# start the server with the 'run()' method
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=9991)
+    app.run(debug = True, host="0.0.0.0", port=9991)
