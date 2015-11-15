@@ -46,6 +46,11 @@ class User(UserMixin):
 def load_user(id):
     return User.get(id)
 
+def add_user_to_config(user, password, config):
+    fd = open(config, 'a')
+    fd.write("\n" + user + " " + password)
+    fd.close()
+
 
 @app.route('/')
 def index():
@@ -76,7 +81,6 @@ def settings():
 
 @app.route('/login/check', methods=['post'])
 def login_check():
-    # validate username and password
     user = User.get(request.form['username'])
     print user
     if (user and user.password == request.form['password']):
@@ -91,6 +95,13 @@ def login_check():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+@app.route('/settings/add_user', methods=['post'])
+def add_user():
+    add_user_to_config(request.form['username'],
+                       request.form['password'],
+                       'users.config')
+    return render_template('settings.html', added_user=True)
 
 if __name__ == '__main__':
     app.run(debug = True, host="0.0.0.0", port=9991)
