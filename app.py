@@ -1,6 +1,6 @@
 import csv
 from flask import Flask, flash, redirect, url_for, request
-from flask import get_flashed_messages, render_template
+from flask import get_flashed_messages, render_template, make_response
 from flask.ext.login import LoginManager, UserMixin
 from flask.ext.login import current_user, login_user, logout_user
 
@@ -102,6 +102,16 @@ def add_user():
                        request.form['password'],
                        'users.config')
     return render_template('settings.html', added_user=True)
+
+@app.route('/settings/export_data', methods=['post'])
+def export_data():
+    csv = """"some_data_here"""
+    response = make_response(csv)
+    # This is the key: Set the right header for the response
+    # to be downloaded, instead of just printed on the browser
+    response.headers["Content-Disposition"] = "attachment; \
+    filename=bleepr_data.csv"
+    return response
 
 if __name__ == '__main__':
     app.run(debug = True, host="0.0.0.0", port=9991)

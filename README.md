@@ -21,3 +21,12 @@ Management system for bleepr
 
 * `python -O app.py`
   - Or `python app.py` if you want to start in debug mode.
+
+## TODO
+
+* Add overview portal
+* Add restaurant overview portal
+* Add analytics portal
+* ~~Add settings portal available only to admins~~
+* ~~Add user management portal~~
+* ~~Add export button~~
