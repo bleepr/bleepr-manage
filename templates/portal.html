@@ -58,6 +58,11 @@
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          {% if request.args.get('not_admin_setting') %}
+          <h3><p class="text-danger" style="text-align:center">
+              You are not allowed to access the settings for this
+              Bleepr Management Portal.</p></h3>
+          {% endif %}
           <h1 class="page-header">Dashboard</h1>
 
           <div class="row placeholders">

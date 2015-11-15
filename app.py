@@ -76,7 +76,7 @@ def settings():
         return render_template('settings.html')
     else:
         flash("You are not authorized!")
-        return redirect(url_for('index'))
+        return redirect(url_for('index', not_admin_setting=True))
 
 
 @app.route('/login/check', methods=['post'])
