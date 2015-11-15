@@ -18,9 +18,7 @@ class UserNotFoundError(Exception):
 class User(UserMixin):
     '''Simple User class'''
     USERS = {
-        # username: password
-        'john@ed': 'lol',
-        'mary': 'love peter',
+        'admin' : 'admin',
         'edran' : 'edran'
     }
 
@@ -61,6 +59,14 @@ def login():
             <input type="submit">
         </form>
     '''
+
+@app.route('/settings')
+def settings():
+    if current_user.id == "admin":
+        return render_template('settings.html')
+    else:
+        flash("You are not authorized!")
+        return redirect(url_for('index'))
 
 
 @app.route('/login/check', methods=['post'])
