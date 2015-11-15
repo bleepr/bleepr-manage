@@ -1,3 +1,4 @@
+import csv
 from flask import Flask, flash, redirect, url_for, request
 from flask import get_flashed_messages, render_template
 from flask.ext.login import LoginManager, UserMixin
@@ -16,17 +17,21 @@ class UserNotFoundError(Exception):
 
 
 class User(UserMixin):
-    '''Simple User class'''
-    USERS = {
-        'admin' : 'admin',
-        'edran' : 'edran'
-    }
-
     def __init__(self, id):
+        self.USERS = self.load_users_from_file("users.config")
         if not id in self.USERS:
             raise UserNotFoundError()
         self.id = id
         self.password = self.USERS[id]
+
+    def load_users_from_file(self, config):
+        users = {}
+        with open(config, "rb") as csvfile:
+            rows = csv.reader(csvfile, delimiter=' ', quotechar='|')
+            for row in rows:
+                print row[0], row[1]
+                users[row[0]] = row[1]
+        return users
 
     @classmethod
     def get(self_class, id):
@@ -86,7 +91,6 @@ def login_check():
 def logout():
     logout_user()
     return redirect(url_for('index'))
-
 
 if __name__ == '__main__':
     app.run(debug = True, host="0.0.0.0", port=9991)
