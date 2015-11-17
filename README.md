@@ -24,9 +24,11 @@ Management system for bleepr
 
 ## TODO
 
-* Add overview portal
-* Add restaurant overview portal
+* Link frontend to API
+* Generate images through sync button
+* ~~Add overview portal~~
 * Add analytics portal
 * ~~Add settings portal available only to admins~~
+ - ~~Management system and data exporter~~
 * ~~Add user management portal~~
 * ~~Add export button~~
