@@ -60,14 +60,63 @@
           <button class="btn btn-lg btn-primary btn-block" type="submit">Export data</button>
         </form>
       </div>
+
+      <div class="row">
+        <h2 class="sub-header">Bleeprs Status</h2>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                {% for datum in table_data[0] %}
+                <th>{{datum}}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for i in range(table_data[0]|count - 1) %}
+              <tr>
+                {% for j in range(table_data[0]|count) %}
+                <td>{{ table_data[j+1][i] }}</td>
+                {% endfor %}
+                <td><button class="btn btn-danger" type="submit">Remove</button></td>
+              </tr>
+              {% endfor %}
+              <tr>
+                <form action="/settings/add_user" method="post">
+                  <h3 class="form-signin-heading">Add a user</h3>
+                  <td>
+                    <label for="id" class="sr-only">id</label>
+                    <input type="text" name="id" id="id" class="form-control" placeholder="id" required autofocus>
+                  </td>
+                  <td>
+                    <label for="table" class="sr-only">table</label>
+                    <input type="text" name="table" id="table" class="form-control" placeholder="table" required autofocus>
+                  </td>
+                  <td>
+                    <label for="active" class="sr-only">active</label>
+                    <input type="text" name="active" id="active" class="form-control" placeholder="active" required autofocus>
+                  </td>
+                  <td>
+                    <label for="action" class="sr-only">action</label>
+                    <input type="text" name="action" id="action" class="form-control" placeholder="action" required autofocus>
+                  </td>
+                  <td>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Add</button>
+                  </td>
+                </form>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <!-- Bootstrap core JavaScript
-    ================================================== -->
+         ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="../static/bootstrap/assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="../static/bootstrap/js/bootstrap.min.js"></script>
-    <script src="../static/bootstrap/js/vendor/holder.min.js"></script>
+      <script src="../static/bootstrap/js/bootstrap.min.js"></script>
+      <script src="../static/bootstrap/js/vendor/holder.min.js"></script>
   </body>
 </html>

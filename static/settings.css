@@ -24,3 +24,11 @@ body {
 .navbar-fixed-top {
   border: 0;
 }
+
+.table td {
+    text-align: center;
+}
+
+.table th {
+    text-align: center;
+}
