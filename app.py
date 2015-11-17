@@ -51,8 +51,16 @@ def add_user_to_config(user, password, config):
     fd.write("\n" + user + " " + password)
     fd.close()
 
-def get_table_data():
+def get_dashboard_table_data():
     return [ ["id", "Table", "Active", "Occupied", "Remaining time"],
+             ["0", "1", "2"], # id
+             ["red", "yellow", "green"], # table
+             ["Yes", "Yes", "No"], # Active
+             ["No", "Yes", "N/A"], # Occupied
+             ["34", "92", "N/A"] ] # Remaining time
+
+def get_settings_table_data():
+    return [ ["id", "Table", "Active", "Action"],
              ["0", "1", "2"], # id
              ["red", "yellow", "green"], # table
              ["Yes", "Yes", "No"], # Active
@@ -62,7 +70,7 @@ def get_table_data():
 @app.route('/')
 def index():
     if current_user.is_authenticated:
-        data = get_table_data()
+        data = get_dashboard_table_data()
         return render_template('portal.html', table_data=data)
     else:
         return render_template('signin.html')
@@ -81,7 +89,8 @@ def login():
 @app.route('/settings')
 def settings():
     if current_user.id == "admin":
-        return render_template('settings.html')
+        data = get_settings_table_data()
+        return render_template('settings.html', table_data=data)
     else:
         flash("You are not authorized!")
         return redirect(url_for('index', not_admin_setting=True))

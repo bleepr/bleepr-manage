@@ -26,7 +26,7 @@ body {
 }
 
 .img-responsive {
-    max-width: 80%;
+    max-width: 50%;
     max-height: auto;
     /* align-content: center; */
 }
