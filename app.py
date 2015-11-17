@@ -51,11 +51,19 @@ def add_user_to_config(user, password, config):
     fd.write("\n" + user + " " + password)
     fd.close()
 
+def get_table_data():
+    return [ ["id", "Table", "Active", "Occupied", "Remaining time"],
+             ["0", "1", "2"], # id
+             ["red", "yellow", "green"], # table
+             ["Yes", "Yes", "No"], # Active
+             ["No", "Yes", "N/A"], # Occupied
+             ["34", "92", "N/A"] ] # Remaining time
 
 @app.route('/')
 def index():
     if current_user.is_authenticated:
-        return render_template('portal.html')
+        data = get_table_data()
+        return render_template('portal.html', table_data=data)
     else:
         return render_template('signin.html')
 
@@ -96,12 +104,14 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+
 @app.route('/settings/add_user', methods=['post'])
 def add_user():
     add_user_to_config(request.form['username'],
                        request.form['password'],
                        'users.config')
     return render_template('settings.html', added_user=True)
+
 
 @app.route('/settings/export_data', methods=['post'])
 def export_data():
