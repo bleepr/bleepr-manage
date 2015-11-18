@@ -75,6 +75,14 @@ def index():
     else:
         return render_template('signin.html')
 
+@app.route('/analytics')
+def analytics():
+    if current_user.is_authenticated:
+        data = get_dashboard_table_data()
+        return render_template('analytics.html', table_data=data)
+    else:
+        return render_template('signin.html')
+
 
 @app.route('/login')
 def login():
