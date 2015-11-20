@@ -1,7 +1,7 @@
 import csv
 from flask import Flask, flash, redirect, url_for, request
 from flask import get_flashed_messages, render_template, make_response
-from flask.ext.login import LoginManager, UserMixin
+from flask.ext.login import LoginManager, UserMixin, login_required
 from flask.ext.login import current_user, login_user, logout_user
 
 app = Flask(__name__)
@@ -9,6 +9,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'some_secret_key_wink_wink'
 
 login_manager = LoginManager()
+login_manager.login_view="signin"
 login_manager.init_app(app)
 
 
@@ -67,15 +68,16 @@ def get_settings_table_data():
              ["No", "Yes", "N/A"], # Occupied
              ["34", "92", "N/A"] ] # Remaining time
 
+
 @app.route('/')
+@login_required
 def index():
-    if current_user.is_authenticated:
-        data = get_dashboard_table_data()
-        return render_template('portal.html', table_data=data)
-    else:
-        return render_template('signin.html')
+    data = get_dashboard_table_data()
+    return render_template('portal.html', table_data=data)
+
 
 @app.route('/analytics')
+@login_required
 def analytics():
     if current_user.is_authenticated:
         data = get_dashboard_table_data()
@@ -84,17 +86,13 @@ def analytics():
         return render_template('signin.html')
 
 
-@app.route('/login')
-def login():
-    return '''
-        <form action="/login/check" method="post">
-            <p>Username: <input name="username" type="text"></p>
-            <p>Password: <input name="password" type="password"></p>
-            <input type="submit">
-        </form>
-    '''
+@app.route('/signin')
+def signin():
+    return render_template('signin.html')
+
 
 @app.route('/settings')
+@login_required
 def settings():
     if current_user.id == "admin":
         data = get_settings_table_data()
@@ -141,4 +139,4 @@ def export_data():
     return response
 
 if __name__ == '__main__':
-    app.run(debug = True, host="0.0.0.0", port=9991)
+    app.run(debug = True, host="127.0.0.1", port=9991)
