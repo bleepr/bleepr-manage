@@ -47,12 +47,20 @@
     </nav>
 
     <div class="container">
-
       <div class="row">
-        {% if request.args.get('not_admin_setting') %}
-        <h3><p class="text-danger" style="text-align:center">
-            You are not allowed to access the settings for this
-            Bleepr Management Portal.</p></h3>
+        {% if request.args.get('not_admin_settings') %}
+        <br>
+        <div class="alert alert-danger text-center" role="alert">
+          <strong>Oh snap!</strong> You are not allowed to access the
+          settings for this Bleepr Management Portal.
+        </div>
+        {% endif %}
+        {% if request.args.get('not_admin_analytics') %}
+        <br>
+        <div class="alert alert-danger text-center" role="alert">
+          <strong>Oh snap!</strong> You are not allowed to access the
+          analytics for this Bleepr Management Portal.
+        </div>
         {% endif %}
         <h1 class="page-header">Overview</h1>
       </div>

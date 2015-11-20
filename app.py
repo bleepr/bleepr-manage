@@ -79,11 +79,11 @@ def index():
 @app.route('/analytics')
 @login_required
 def analytics():
-    if current_user.is_authenticated:
-        data = get_dashboard_table_data()
-        return render_template('analytics.html', table_data=data)
+    if current_user.id == "admin":
+        return render_template('analytics.html')
     else:
-        return render_template('signin.html')
+        flash("You are not authorized!")
+        return redirect(url_for('index', not_admin_analytics=True))
 
 
 @app.route('/signin')
@@ -99,7 +99,7 @@ def settings():
         return render_template('settings.html', table_data=data)
     else:
         flash("You are not authorized!")
-        return redirect(url_for('index', not_admin_setting=True))
+        return redirect(url_for('index', not_admin_settings=True))
 
 
 @app.route('/login/check', methods=['post'])
