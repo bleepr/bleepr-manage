@@ -49,40 +49,89 @@
     <div class="container">
 
       <div class="row">
-        {% if request.args.get('not_admin_setting') %}
-        <h3><p class="text-danger" style="text-align:center">
-            You are not allowed to access the settings for this
-            Bleepr Management Portal.</p></h3>
-        {% endif %}
-        <h1 class="page-header">Overview</h1>
+        <h1 class="page-header">Analytics</h1>
       </div>
 
       <div class="row">
-        <img class="img-responsive center-block" src ="/static/test_map.png">
+        <h3>Heatmap</h3>
       </div>
-      <div class="row">
-        <h2 class="sub-header">Bleeprs Status</h2>
-        <div class="table-responsive">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                {% for datum in table_data[0] %}
-                <th>{{datum}}</th>
-                {% endfor %}
-              </tr>
-            </thead>
-            <tbody>
-              {% for i in range(table_data[0]|count - 1) %}
-              <tr>
-                {% for j in range(table_data[0]|count) %}
-                <td>{{ table_data[j+1][i] }}</td>
-                {% endfor %}
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+      <div class="row voffset vertical-center">
+        <div class="col-md-6">
+          <div class="thumbnail center-block">
+            <img class="img-responsive" src ="/static/test_map.png">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <p class="text-center">
+            Heatmap
+          </p>
         </div>
       </div>
+
+      <div class="row">
+        <h3>Heatmap</h3>
+      </div>
+      <div class="row voffset vertical-center">
+        <div class="col-md-6">
+          <div class="thumbnail center-block">
+            <img class="img-responsive" src ="/static/test_map.png">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <p class="text-center">
+            Heatmap
+          </p>
+        </div>
+      </div>
+
+      <div class="row">
+        <h3>Orders history</h3>
+      </div>
+      <div class="row voffset vertical-center">
+        <div class="col-md-6">
+          <div class="thumbnail center-block">
+            <img class="img-responsive" src ="/static/test_map.png">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <p class="text-center">
+            Orders history
+          </p>
+        </div>
+      </div>
+
+      <div class="row">
+        <h3>Happiness history</h3>
+      </div>
+      <div class="row voffset vertical-center">
+        <div class="col-md-6">
+          <div class="thumbnail center-block">
+            <img class="img-responsive" src ="/static/test_map.png">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <p class="text-center">
+            Happiness history
+          </p>
+        </div>
+      </div>
+
+      <div class="row">
+        <h3></h3>
+      </div>
+      <div class="row voffset vertical-center">
+        <div class="col-md-6">
+          <div class="thumbnail center-block">
+            <img class="img-responsive" src ="/static/test_map.png">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <p class="text-center">
+            Heatmap
+          </p>
+        </div>
+      </div>
+
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
       <script>window.jQuery || document.write('<script src="../static/bootstrap/assets/js/vendor/jquery.min.js"><\/script>')</script>
         <script src="../static/bootstrap/js/bootstrap.min.js"></script>
