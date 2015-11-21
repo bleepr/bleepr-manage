@@ -14,7 +14,7 @@ class DataManager(object):
         return r.json()
 
     def insert_datum(self, data):
-        print(data.json())
+        print("Inserting: ", data.json())
 
         headers = {'Content-type': 'application/json',
                    'Accept': 'text/plain'}
@@ -52,12 +52,11 @@ class Table(object):
 
 
 class Costumer(object):
-    def __init__(self, first_name, last_name, phone, email, cards):
+    def __init__(self, first_name, last_name, phone, email):
         self.first_name = first_name
         self.last_name = last_name
         self.phone = phone
         self.email = email
-        self.cards = cards
 
     def json(self):
         return json.dumps(self.__dict__)
@@ -70,9 +69,23 @@ class TableDataManager(DataManager):
 
 
 class CostumersDataManager(DataManager):
-    # TOFIX: cards don't get added
+
     def __init__(self):
         self.url = "http://bleepr.io/customers"
+
+    def add_card(self, user_id, id):
+        c = {"card": {"id": id}}
+
+        headers = {'Content-type': 'application/json',
+                   'Accept': 'text/plain'}
+
+        s = self.url+ "/" + str(user_id) + "/cards"
+        r = requests.post(s, data=c,
+                          headers=headers)
+
+        if(r.status_code != 406):
+            raise Exception("POST response received was %s" % r.status_code)
+
 
 
 class CardsDataManager(DataManager):
@@ -84,11 +97,9 @@ class CardsDataManager(DataManager):
 def slip_costumers():
     cd = CostumersDataManager()
     c = Costumer("Nantas", "Nardelli", "07592385707",
-                 "nantas.nardelli+slip@gmail.com", [{"id":"1215573"}])
+                 "nantas.nardelli+slip@gmail.com")
     cd.insert_datum(c)
-    c = Costumer("Theo", "Scott", "01234567890", "theo.scott@gmail.com",
-                 [{"id":"1231147"}])
-    cd.insert_datum(c)
+
 
 
 def slip_tables():
