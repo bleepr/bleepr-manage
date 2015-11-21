@@ -30,6 +30,7 @@ class DataManager(object):
         return
 
     def delete_datum(self, id):
+        print("Deleting %s" % id)
         r = requests.delete(self.url + "/" + str(id))
         if (r.status_code != 204):
             raise Exception("DELETE response received was %s" % r.status_code)
@@ -62,6 +63,15 @@ class Costumer(object):
         return json.dumps(self.__dict__)
 
 
+class Bleepr(object):
+    def __init__(self, id, table_id, is_active):
+        self.id = id
+        # self.table_id = table_id
+        self.is_active = is_active
+
+    def json(self):
+        return json.dumps(self.__dict__)
+
 class TableDataManager(DataManager):
 
     def __init__(self):
@@ -80,7 +90,7 @@ class CostumersDataManager(DataManager):
                    'Accept': 'text/plain'}
 
         s = self.url+ "/" + str(user_id) + "/cards"
-        r = requests.post(s, data=c,
+        r = requests.post(s, data=json.dumps(c),
                           headers=headers)
 
         if(r.status_code != 406):
@@ -93,6 +103,11 @@ class CardsDataManager(DataManager):
     def __init__(self):
         self.url = "http://bleepr.io/cards"
 
+class BleeprsDataManager(DataManager):
+
+    def __init__(self):
+        self.url = "http://bleepr.io/bleeprs"
+
 
 def slip_costumers():
     cd = CostumersDataManager()
@@ -100,11 +115,27 @@ def slip_costumers():
                  "nantas.nardelli+slip@gmail.com")
     cd.insert_datum(c)
 
+def slip_bleeprs():
+    bd = BleeprsDataManager()
+    bd.clear_database()
+    b = Bleepr("00:00:00:00:00", 45, 1)
+    bd.insert_datum(b)
+    b = Bleepr("00:00:00:00:01", 46, 0)
+    bd.insert_datum(b)
+    b = Bleepr("00:00:00:00:02", 47, 0)
+    bd.insert_datum(b)
+    b = Bleepr("00:00:00:00:03", 48, 0)
+    bd.insert_datum(b)
+    b = Bleepr("00:00:00:00:04", 49, 0)
+    bd.insert_datum(b)
+    b = Bleepr("00:00:00:00:05", 50, 0)
+    bd.insert_datum(b)
 
 
 def slip_tables():
     dt = TableDataManager()
-    dt.clear_database()
+    # WATCH OUT - Deletes occupancies as well!
+    # dt.clear_database()
     t = Table(45,249,80,485, "One")
     dt.insert_datum(t)
     t = Table(300,60,180,100, "Two")
@@ -121,6 +152,7 @@ def slip_tables():
 def main():
     # slip_tables()
     slip_costumers()
+    slip_bleeprs()
 
 if __name__ == "__main__":
     main()
