@@ -2,15 +2,21 @@ from __future__ import print_function
 import requests
 import json
 
+class DataTypology(object):
+
+    def json(self):
+        return json.dumps(self.__dict__)
+
+
 class DataManager(object):
 
     def __init__(self):
         self.url = ""
 
     def get_data(self):
+        print("Getting data")
         r = requests.get(self.url)
-        print(r.status_code)
-        print(r.headers['content-type'])
+        print(r.json())
         return r.json()
 
     def insert_datum(self, data):
@@ -36,11 +42,13 @@ class DataManager(object):
             raise Exception("DELETE response received was %s" % r.status_code)
 
     def clear_database(self):
+        print("Clearing database")
         data = self.get_data()
         for d in data:
             self.delete_datum(d["id"])
 
-class Table(object):
+
+class Table(DataTypology):
     def __init__(self, x, y, width, height, name):
         self.name = name
         self.position_x = x
@@ -48,29 +56,21 @@ class Table(object):
         self.width = width
         self.height = height
 
-    def json(self):
-        return json.dumps(self.__dict__)
 
-
-class Costumer(object):
+class Customer(DataTypology):
     def __init__(self, first_name, last_name, phone, email):
         self.first_name = first_name
         self.last_name = last_name
         self.phone = phone
         self.email = email
 
-    def json(self):
-        return json.dumps(self.__dict__)
 
-
-class Bleepr(object):
+class Bleepr(DataTypology):
     def __init__(self, id, table_id, is_active):
         self.id = id
-        # self.table_id = table_id
+        # self.table_id = table_id # saved somewhere else
         self.is_active = is_active
 
-    def json(self):
-        return json.dumps(self.__dict__)
 
 class TableDataManager(DataManager):
 
@@ -78,21 +78,26 @@ class TableDataManager(DataManager):
         self.url = "http://bleepr.io/tables"
 
 
-class CostumersDataManager(DataManager):
+class CustomersDataManager(DataManager):
 
     def __init__(self):
         self.url = "http://bleepr.io/customers"
 
     def add_card(self, user_id, id):
+        print("Adding card %s for user %s" % (id, user_id))
         c = {"card": {"id": id}}
 
         headers = {'Content-type': 'application/json',
                    'Accept': 'text/plain'}
 
         s = self.url+ "/" + str(user_id) + "/cards"
+
         r = requests.post(s, data=json.dumps(c),
                           headers=headers)
 
+        if(r.status_code == 500):
+            print("Card was already added!")
+            return
         if(r.status_code != 406):
             raise Exception("POST response received was %s" % r.status_code)
 
@@ -109,11 +114,13 @@ class BleeprsDataManager(DataManager):
         self.url = "http://bleepr.io/bleeprs"
 
 
-def slip_costumers():
-    cd = CostumersDataManager()
-    c = Costumer("Nantas", "Nardelli", "07592385707",
+def slip_customers():
+    cd = CustomersDataManager()
+    c = Customer("Nantas", "Nardelli", "07592385707",
                  "nantas.nardelli+slip@gmail.com")
     cd.insert_datum(c)
+
+    cd.add_card(29, 9876789)
 
 def slip_bleeprs():
     bd = BleeprsDataManager()
@@ -134,7 +141,7 @@ def slip_bleeprs():
 
 def slip_tables():
     dt = TableDataManager()
-    # WATCH OUT - Deletes occupancies as well!
+    # WATCH OUT - Deleting tables means deleting occupancies as well!
     # dt.clear_database()
     t = Table(45,249,80,485, "One")
     dt.insert_datum(t)
@@ -149,10 +156,10 @@ def slip_tables():
     t = Table(300,250,180,100, "Six")
     dt.insert_datum(t)
 
-def main():
-    # slip_tables()
-    slip_costumers()
-    slip_bleeprs()
+# def main():
+#     slip_tables()
+#     slip_customers()
+#     slip_bleeprs()
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
