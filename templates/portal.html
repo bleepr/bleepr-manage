@@ -80,7 +80,7 @@
               </tr>
             </thead>
             <tbody>
-              {% for i in range(table_data[0]|count - 1) %}
+              {% for i in range(table_data[1]|count) %}
               <tr>
                 {% for j in range(table_data[0]|count) %}
                 <td>{{ table_data[j+1][i] }}</td>
