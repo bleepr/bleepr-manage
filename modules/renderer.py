@@ -3,24 +3,29 @@ import random
 import csv
 from PIL import Image, ImageDraw
 
+import requests
+import json
+
 class Table(object):
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, busy):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
+        self.busy = busy
 
     def get_bounding_points(self):
         x_0 = self.x - (self.width / 2)
         y_0 = self.y - (self.height / 2)
         x_1 = self.x + (self.width / 2)
         y_1 = self.y + (self.height / 2)
-        print([x_0, y_0, x_1, y_1])
+        print("Table bounding points %s" % [x_0, y_0, x_1, y_1])
         return [x_0, y_0, x_1, y_1]
 
 class Renderer(object):
 
     def __init__(self, mode="text", data_path=None):
+        self.url = "http://bleepr.io/tables"
         self.mode = mode
         self.data_path = data_path
         self.tables = list()
@@ -59,8 +64,8 @@ class Renderer(object):
         """
         if self.mode == "text":
             self._load_text(path)
-        elif self.mode == "db":
-            return NotImplementedError
+        elif self.mode == "api":
+            return self._load_api()
 
     def _load_text(self, path):
         with open(path, "rb") as file:
@@ -72,8 +77,28 @@ class Renderer(object):
                           eval(row[3]))
                 self.tables.append(t)
 
+    def _load_api(self):
+        print("Getting data")
+        r = requests.get(self.url)
+        tables = r.json()
+        o = requests.get(self.url + "/occupied")
+        occupied = o.json()
+        for d in tables:
+            is_occupied = d['id'] in occupied['tables']
+            t = Table(d['position_x'],
+                      d['position_y'],
+                      d['width'],
+                      d['height'],
+                      is_occupied)
+            print("Adding %s" % d)
+            self.tables.append(t)
+
+
     def _draw_table(self, table):
-        rcolour = random.choice(self.colours)
+        if table.busy:
+            rcolour = self.colours[0]
+        else:
+            rcolour = self.colours[3]
         self.draw.rectangle(table.get_bounding_points(),
                             outline="#000000", fill=rcolour)
         return None

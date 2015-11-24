@@ -3,6 +3,7 @@ from flask import Flask, flash, redirect, url_for, request
 from flask import get_flashed_messages, render_template, make_response
 from flask.ext.login import LoginManager, UserMixin, login_required
 from flask.ext.login import current_user, login_user, logout_user
+from modules import renderer
 
 app = Flask(__name__)
 
@@ -12,6 +13,13 @@ login_manager = LoginManager()
 login_manager.login_view="signin"
 login_manager.init_app(app)
 
+r = renderer.Renderer(mode="api")
+
+def refresh_table_image():
+    r.load_map("share/base_image.png")
+    r.load_data()
+    r.add_tables()
+    r.save_map("static/status.png")
 
 class UserNotFoundError(Exception):
     pass
@@ -20,7 +28,7 @@ class UserNotFoundError(Exception):
 class User(UserMixin):
     def __init__(self, id):
         self.USERS = self.load_users_from_file("users.config")
-        if not id in self.USERS:
+        if id not in self.USERS:
             raise UserNotFoundError()
         self.id = id
         self.password = self.USERS[id]
@@ -47,10 +55,12 @@ class User(UserMixin):
 def load_user(id):
     return User.get(id)
 
+
 def add_user_to_config(user, password, config):
     fd = open(config, 'a')
     fd.write("\n" + user + " " + password)
     fd.close()
+
 
 def get_dashboard_table_data():
     return [ ["id", "Table", "Active", "Occupied", "Remaining time"],
@@ -72,6 +82,7 @@ def get_settings_table_data():
 @app.route('/')
 @login_required
 def index():
+    refresh_table_image()
     data = get_dashboard_table_data()
     return render_template('portal.html', table_data=data)
 
