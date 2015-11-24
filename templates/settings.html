@@ -60,7 +60,7 @@
       </div>
 
       <div class="row">
-        <h2 class="sub-header">Bleeprs Status</h2>
+        <h2 class="sub-header">Registered Bleeprs</h2>
         <div class="table-responsive">
           <table class="table table-striped">
             <thead>
@@ -76,12 +76,15 @@
                 {% for j in range(table_data[0]|count) %}
                 <td>{{ table_data[j+1][i] }}</td>
                 {% endfor %}
-                <td><button class="btn btn-danger" type="submit">Remove</button></td>
+                <form action="/settings/remove_bleepr" method="post">
+                  <td><button class="btn btn-danger" type="submit"
+                              name={{ table_data[1][i] }}>Remove</button></td>
+                </form>
+
               </tr>
               {% endfor %}
               <tr>
-                <form action="/settings/add_user" method="post">
-                  <h3 class="form-signin-heading">Add a user</h3>
+                <form action="/settings/add_bleepr" method="post">
                   <td>
                     <label for="id" class="sr-only">id</label>
                     <input type="text" name="id" id="id" class="form-control" placeholder="id" required autofocus>

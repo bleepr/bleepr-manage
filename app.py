@@ -1,3 +1,4 @@
+import json
 import csv
 import requests
 import dateutil.parser
@@ -137,7 +138,7 @@ def get_settings_table_data():
         ids.append(bl['id'])
         tabls.append(bl['table_id'])
         activs.append(bl['is_active'])
-    return [ ["Id", "Table", "Active"], ids, tabls, activs ]
+    return [ ["id", "Table", "Active"], ids, tabls, activs ]
 
 
 @app.route('/')
@@ -197,7 +198,29 @@ def add_user():
     add_user_to_config(request.form['username'],
                        request.form['password'],
                        'users.config')
-    return render_template('settings.html', added_user=True)
+    return settings()
+
+@app.route('/settings/add_bleepr', methods=['post'])
+def add_bleepr():
+    d = {}
+    d['id'] = request.form['id']
+    d['table_id'] = int(request.form['table'])
+    d['is_active'] = request.form['active'] in ['true', 'TRUE', 'Yes',
+                                                'True', 'y', 'yes']
+    headers = {'Content-type': 'application/json',
+               'Accept': 'text/plain'}
+
+    r = requests.post("http://bleepr.io/bleeprs", data=json.dumps(d),
+                      headers=headers)
+    if(r.status_code != 406):
+        print("POST response received was %s" % r.status_code)
+    return settings()
+
+@app.route('/settings/remove_bleepr', methods=['post'])
+def remove_bleepr():
+    id = request.form.keys()[0]
+    r = requests.delete("http://bleepr.io/bleeprs/" + str(id))
+    return settings()
 
 
 @app.route('/settings/export_data', methods=['post'])
