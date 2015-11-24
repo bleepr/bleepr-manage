@@ -1,13 +1,26 @@
 import csv
 import requests
 import dateutil.parser
-import datetime
+
 from flask import Flask, flash, redirect, url_for, request
 from flask import get_flashed_messages, render_template, make_response
 from flask.ext.login import LoginManager, UserMixin, login_required
 from flask.ext.login import current_user, login_user, logout_user
 from modules import renderer
 
+from datetime import tzinfo, timedelta, datetime
+
+ZERO = timedelta(0)
+
+class UTC(tzinfo):
+    def utcoffset(self, dt):
+        return ZERO
+    def tzname(self, dt):
+        return "UTC"
+    def dst(self, dt):
+        return ZERO
+
+utc = UTC()
 
 app = Flask(__name__)
 
@@ -67,12 +80,13 @@ def add_user_to_config(user, password, config):
 
 
 def get_dashboard_table_data():
-    data = ["Bleepr id", "Table", "Active", "Occupied", "Remaining time"]
+    data = ["Bleepr id", "Table", "Active", "Occupied", "Time Spent", "Remaining time"]
     ids = []
     tables = []
     active = []
     occupied = []
     remaining_time = []
+    time_spent = []
     bls = (requests.get("http://bleepr.io/bleeprs")).json()
     curs = (requests.get("http://bleepr.io/tables/occupied")).json()
     tabls = (requests.get("http://bleepr.io/tables")).json()
@@ -100,10 +114,19 @@ def get_dashboard_table_data():
             if not oc[0]["end"]:
                 remaining_time.append("N/A")
             else:
-                d = datetime.datetime.now() - dateutil.parser.parse(oc[0]["end"])
-                remaining_time.append(d.TotalMinutes)
-
-    return [data, ids, tables, active, occupied, remaining_time]
+                d = dateutil.parser.parse(oc[0]["end"]) - datetime.now(utc)
+                minutes = int((d.total_seconds() % 3600) / 60)
+                remaining_time.append(str(minutes) + " mins")
+        if bl['table_id'] not in curs['tables']:
+            remaining_time.append("N/A")
+        else:
+            url = "http://bleepr.io/tables/" + str(bl['table_id']) + "/occupancies/current"
+            print(url)
+            oc = (requests.get(url)).json()
+            d  = datetime.now(utc) - dateutil.parser.parse(oc[0]["start"])
+            minutes = int((d.total_seconds() % 3600) / 60)
+            time_spent.append(str(minutes) + " mins")
+    return [data, ids, tables, active, occupied, time_spent, remaining_time]
 
 def get_settings_table_data():
     return [ ["id", "Table", "Active", "Action"],
