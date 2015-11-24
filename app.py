@@ -1,9 +1,13 @@
 import csv
+import requests
+import dateutil.parser
+import datetime
 from flask import Flask, flash, redirect, url_for, request
 from flask import get_flashed_messages, render_template, make_response
 from flask.ext.login import LoginManager, UserMixin, login_required
 from flask.ext.login import current_user, login_user, logout_user
 from modules import renderer
+
 
 app = Flask(__name__)
 
@@ -63,12 +67,43 @@ def add_user_to_config(user, password, config):
 
 
 def get_dashboard_table_data():
-    return [ ["id", "Table", "Active", "Occupied", "Remaining time"],
-             ["0", "1", "2"], # id
-             ["red", "yellow", "green"], # table
-             ["Yes", "Yes", "No"], # Active
-             ["No", "Yes", "N/A"], # Occupied
-             ["34", "92", "N/A"] ] # Remaining time
+    data = ["Bleepr id", "Table", "Active", "Occupied", "Remaining time"]
+    ids = []
+    tables = []
+    active = []
+    occupied = []
+    remaining_time = []
+    bls = (requests.get("http://bleepr.io/bleeprs")).json()
+    curs = (requests.get("http://bleepr.io/tables/occupied")).json()
+    tabls = (requests.get("http://bleepr.io/tables")).json()
+
+    for bl in bls:
+        ids.append(bl['id'])
+        i = next(index for (index, d) in enumerate(tabls)
+                 if d["id"] == bl['table_id'])
+        tables.append(tabls[i]["name"])
+        active.append(bl['is_active'])
+        if bl['table_id'] in curs['tables']:
+            occupied.append("Yes")
+        elif bl['is_active']:
+            occupied.append("No")
+        else:
+            occupied.append("N/A")
+        if bl['table_id'] not in curs['tables']:
+            remaining_time.append("N/A")
+        else:
+            url = "http://bleepr.io/tables/" + str(bl['table_id']) + "/occupancies/current"
+            print(url)
+            oc = (requests.get(url)).json()
+            print("###########################")
+            print(oc)
+            if not oc[0]["end"]:
+                remaining_time.append("N/A")
+            else:
+                d = datetime.datetime.now() - dateutil.parser.parse(oc[0]["end"])
+                remaining_time.append(d.TotalMinutes)
+
+    return [data, ids, tables, active, occupied, remaining_time]
 
 def get_settings_table_data():
     return [ ["id", "Table", "Active", "Action"],
