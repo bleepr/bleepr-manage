@@ -129,12 +129,15 @@ def get_dashboard_table_data():
     return [data, ids, tables, active, occupied, time_spent, remaining_time]
 
 def get_settings_table_data():
-    return [ ["id", "Table", "Active", "Action"],
-             ["0", "1", "2"], # id
-             ["red", "yellow", "green"], # table
-             ["Yes", "Yes", "No"], # Active
-             ["No", "Yes", "N/A"], # Occupied
-             ["34", "92", "N/A"] ] # Remaining time
+    bls = (requests.get("http://bleepr.io/bleeprs")).json()
+    ids = []
+    tabls = []
+    activs = []
+    for bl in bls:
+        ids.append(bl['id'])
+        tabls.append(bl['table_id'])
+        activs.append(bl['is_active'])
+    return [ ["Id", "Table", "Active"], ids, tabls, activs ]
 
 
 @app.route('/')

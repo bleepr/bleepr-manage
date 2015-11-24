@@ -39,9 +39,6 @@
             <li><a href="/settings">Settings</a></li>
             <li><a href="/logout">Logout</a></li>
           </ul>
-          <form class="navbar-form navbar-right">
-            <input type="text" class="form-control" placeholder="Search...">
-          </form>
         </div>
       </div>
     </nav>
@@ -74,7 +71,7 @@
               </tr>
             </thead>
             <tbody>
-              {% for i in range(table_data[0]|count - 1) %}
+              {% for i in range(table_data[1]|count) %}
               <tr>
                 {% for j in range(table_data[0]|count) %}
                 <td>{{ table_data[j+1][i] }}</td>
@@ -96,10 +93,6 @@
                   <td>
                     <label for="active" class="sr-only">active</label>
                     <input type="text" name="active" id="active" class="form-control" placeholder="active" required autofocus>
-                  </td>
-                  <td>
-                    <label for="action" class="sr-only">action</label>
-                    <input type="text" name="action" id="action" class="form-control" placeholder="action" required autofocus>
                   </td>
                   <td>
                     <button class="btn btn-lg btn-primary btn-block" type="submit">Add</button>
