@@ -7,7 +7,7 @@ from flask import Flask, flash, redirect, url_for, request
 from flask import get_flashed_messages, render_template, make_response
 from flask.ext.login import LoginManager, UserMixin, login_required
 from flask.ext.login import current_user, login_user, logout_user
-from modules import renderer
+from modules import renderer, data_visualiser
 
 from datetime import tzinfo, timedelta, datetime
 
@@ -32,12 +32,19 @@ login_manager.login_view="signin"
 login_manager.init_app(app)
 
 r = renderer.Renderer(mode="api")
+dv = data_visualiser.DataVisualiser()
 
 def refresh_table_image():
     r.load_map("share/base_image.png")
     r.load_data()
     r.add_tables()
     r.save_map("static/status.png")
+
+def refresh_heatmap():
+    dv.get_base_image('static/status.png')
+    dv.save_heatmap()
+    dv.save_order_hist()
+    dv.save_happiness()
 
 class UserNotFoundError(Exception):
     pass
@@ -153,6 +160,7 @@ def index():
 @login_required
 def analytics():
     if current_user.id == "admin":
+        refresh_heatmap()
         return render_template('analytics.html')
     else:
         flash("You are not authorized!")
